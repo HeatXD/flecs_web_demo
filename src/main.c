@@ -1,7 +1,4 @@
 #include "../include/all_imports.h" 
-#include <SDL2/SDL_keyboard.h>
-#include <SDL2/SDL_scancode.h>
-#include <SDL2/SDL_stdinc.h>
 
 #define MOVESPEED 500
 
