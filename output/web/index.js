@@ -1766,6 +1766,46 @@ var ASM_CONSTS = {
       return demangleAll(js);
     }
 
+  function ___assert_fail(condition, filename, line, func) {
+      abort('Assertion failed: ' + UTF8ToString(condition) + ', at: ' + [filename ? UTF8ToString(filename) : 'unknown filename', line, func ? UTF8ToString(func) : 'unknown function']);
+    }
+
+  function _abort() {
+      abort();
+    }
+
+  var _emscripten_get_now;if (ENVIRONMENT_IS_NODE) {
+    _emscripten_get_now = function() {
+      var t = process['hrtime']();
+      return t[0] * 1e3 + t[1] / 1e6;
+    };
+  } else if (typeof dateNow !== 'undefined') {
+    _emscripten_get_now = dateNow;
+  } else _emscripten_get_now = function() { return performance.now(); }
+  ;
+  
+  var _emscripten_get_now_is_monotonic=true;;
+  
+  function setErrNo(value) {
+      HEAP32[((___errno_location())>>2)] = value;
+      return value;
+    }
+  function _clock_gettime(clk_id, tp) {
+      // int clock_gettime(clockid_t clk_id, struct timespec *tp);
+      var now;
+      if (clk_id === 0) {
+        now = Date.now();
+      } else if ((clk_id === 1 || clk_id === 4) && _emscripten_get_now_is_monotonic) {
+        now = _emscripten_get_now();
+      } else {
+        setErrNo(28);
+        return -1;
+      }
+      HEAP32[((tp)>>2)] = (now/1000)|0; // seconds
+      HEAP32[(((tp)+(4))>>2)] = ((now % 1000)*1000*1000)|0; // nanoseconds
+      return 0;
+    }
+
   function _emscripten_memcpy_big(dest, src, num) {
       HEAPU8.copyWithin(dest, src, src + num);
     }
@@ -1781,14 +1821,13 @@ var ASM_CONSTS = {
       abortOnCannotGrowMemory(requestedSize);
     }
 
-  function flush_NO_FILESYSTEM() {
-      // flush anything remaining in the buffers during shutdown
-      if (typeof _fflush !== 'undefined') _fflush(0);
-      var buffers = SYSCALLS.buffers;
-      if (buffers[1].length) SYSCALLS.printChar(1, 10);
-      if (buffers[2].length) SYSCALLS.printChar(2, 10);
+  function _emscripten_thread_sleep(msecs) {
+      var start = _emscripten_get_now();
+      while (_emscripten_get_now() - start < msecs) {
+        // Do nothing.
+      }
     }
-  
+
   var SYSCALLS={mappings:{},buffers:[null,[],[]],printChar:function(stream, curr) {
         var buffer = SYSCALLS.buffers[stream];
         assert(buffer);
@@ -1811,6 +1850,22 @@ var ASM_CONSTS = {
         else assert(high === -1);
         return low;
       }};
+  function _fd_close(fd) {
+      abort('it should not be possible to operate on streams when !SYSCALLS_REQUIRE_FILESYSTEM');
+      return 0;
+    }
+
+  function _fd_seek(fd, offset_low, offset_high, whence, newOffset) {
+  abort('it should not be possible to operate on streams when !SYSCALLS_REQUIRE_FILESYSTEM');
+  }
+
+  function flush_NO_FILESYSTEM() {
+      // flush anything remaining in the buffers during shutdown
+      if (typeof _fflush !== 'undefined') _fflush(0);
+      var buffers = SYSCALLS.buffers;
+      if (buffers[1].length) SYSCALLS.printChar(1, 10);
+      if (buffers[2].length) SYSCALLS.printChar(2, 10);
+    }
   function _fd_write(fd, iov, iovcnt, pnum) {
       // hack to support printf in SYSCALLS_REQUIRE_FILESYSTEM=0
       var num = 0;
@@ -1859,8 +1914,14 @@ function intArrayToString(array) {
 
 
 var asmLibraryArg = {
+  "__assert_fail": ___assert_fail,
+  "abort": _abort,
+  "clock_gettime": _clock_gettime,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
   "emscripten_resize_heap": _emscripten_resize_heap,
+  "emscripten_thread_sleep": _emscripten_thread_sleep,
+  "fd_close": _fd_close,
+  "fd_seek": _fd_seek,
   "fd_write": _fd_write,
   "setTempRet0": _setTempRet0
 };
@@ -1906,6 +1967,21 @@ var _emscripten_stack_get_free = Module["_emscripten_stack_get_free"] = function
 var _emscripten_stack_get_end = Module["_emscripten_stack_get_end"] = function() {
   return (_emscripten_stack_get_end = Module["_emscripten_stack_get_end"] = Module["asm"]["emscripten_stack_get_end"]).apply(null, arguments);
 };
+
+/** @type {function(...*):?} */
+var dynCall_vijiiiii = Module["dynCall_vijiiiii"] = createExportWrapper("dynCall_vijiiiii");
+
+/** @type {function(...*):?} */
+var dynCall_vijiiiiiii = Module["dynCall_vijiiiiiii"] = createExportWrapper("dynCall_vijiiiiiii");
+
+/** @type {function(...*):?} */
+var dynCall_ijiji = Module["dynCall_ijiji"] = createExportWrapper("dynCall_ijiji");
+
+/** @type {function(...*):?} */
+var dynCall_iiji = Module["dynCall_iiji"] = createExportWrapper("dynCall_iiji");
+
+/** @type {function(...*):?} */
+var dynCall_iiiijiiijiiiii = Module["dynCall_iiiijiiijiiiii"] = createExportWrapper("dynCall_iiiijiiijiiiii");
 
 /** @type {function(...*):?} */
 var dynCall_jiji = Module["dynCall_jiji"] = createExportWrapper("dynCall_jiji");
