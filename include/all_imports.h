@@ -9,7 +9,6 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_events.h>
 // standard libs
-#include <stdio.h>
 #include <stdlib.h>
 // include emscripten
 #ifdef __EMSCRIPTEN__
