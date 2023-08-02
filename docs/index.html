@@ -5,7 +5,16 @@
 </head>
 <body>
 <script src="index.js">
-    flecs_demo();            
+// Assuming the Promise is returned from a function called "myAsyncFunction"
+flecs_demo().then((result) => {
+  // Code to execute when the Promise is resolved (fulfilled).
+  console.log("Promise resolved:", result);
+
+  // Place your code here that depends on the resolved value.
+}).catch((error) => {
+  // Code to handle errors if the Promise is rejected.
+  console.error("Promise rejected:", error);
+});        
 </script>
 </body>
 </html>
