@@ -1,4 +1,4 @@
-#include "flecs.h"
+#include "flecs/flecs.h"
 #include <stdio.h>
 
 // Dummy system
@@ -8,7 +8,7 @@ void Sys(ecs_iter_t *it) {
 
 int main() {
   ecs_world_t *ecs = ecs_init();
-  
+
   // Create three custom phases. Note that the two phases have the Phase tag,
   // which is necessary for the builtin pipeline to discover which systems it
   // should run.
