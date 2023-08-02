@@ -1,0 +1,23 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="output.js"></script>
+</head>
+<body>
+    <script>
+        // Load the Emscripten module
+        const Module = require('./index.js');
+
+        // Wait for the Emscripten module to be initialized
+        Module.onRuntimeInitialized = function() {
+            console.log('WebAssembly module initialized.');
+
+            // Call the C/C++ main function
+            Module.ccall('main', 'number', [], []);
+
+            console.log('main() called.');
+        };
+    </script>
+</body>
+</html>
