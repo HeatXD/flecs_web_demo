@@ -1,4 +1,4 @@
-- name: Setup emsdk
+name: Setup emsdk
   uses: mymindstorm/setup-emsdk@v11
   with:
     # Make sure to set a version number!
