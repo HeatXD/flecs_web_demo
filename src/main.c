@@ -64,6 +64,7 @@ int run_game(SDL_Renderer* rend) {
   ecs_set(world, Player, Size2, {50,50});
   // Setup gameplay loops
   #ifdef __EMSCRIPTEN__
+        printf("TESTING!");
         emscripten_set_main_loop(main_loop, 0, 1);
   #else
         running = true;
