@@ -7,8 +7,6 @@ typedef struct Vector2 {
     float y;
 } Pos2, Size2;
 
-// flag for the gameloop
-bool running = false;
 // Create a world 
 ecs_world_t* world = NULL;
 // SDL Events to make our program interactive
@@ -26,11 +24,7 @@ void main_loop(void){
     while (SDL_PollEvent(&evt)) {
         switch (evt.type) {
             case SDL_QUIT: 
-                #ifdef __EMSCRIPTEN__
-                    emscripten_cancel_main_loop();
-                #else
-                    running = false;
-                #endif
+                emscripten_cancel_main_loop();
                 break;
         }
     }
@@ -62,15 +56,8 @@ int run_game(SDL_Renderer* rend) {
   // Set entity start Position and Size
   ecs_set(world, Player, Pos2, {100,100});
   ecs_set(world, Player, Size2, {50,50});
-  // Setup gameplay loops
-  #ifdef __EMSCRIPTEN__
-        printf("TESTING!");
-        emscripten_set_main_loop(main_loop, 0, 1);
-  #else
-        running = true;
-  	while (running == true) {main_loop();}
-  
-#endif
+  // Setup gameplay loop
+  emscripten_set_main_loop(main_loop, 0, 1);
   return ecs_fini(world);
 }
 
