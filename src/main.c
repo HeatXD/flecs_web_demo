@@ -68,11 +68,13 @@ int run_game(SDL_Renderer* rend) {
   #else
         running = true;
   	while (running == true) {main_loop();}
-  #endif
+  
+#endif
   return ecs_fini(world);
 }
 
 int main(int argc, char *argv[]) {
+  SDL_Init(SDL_INIT_EVERYTHING);	
   // Setup window
   SDL_Window *window = SDL_CreateWindow("Flecs Web Demo!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 900, 900, SDL_WINDOW_SHOWN);
   // Setup renderer

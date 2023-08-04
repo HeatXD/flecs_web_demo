@@ -9415,89 +9415,6 @@ var ASM_CONSTS = {
 
 
 
-  function getCFunc(ident) {
-      var func = Module['_' + ident]; // closure exported function
-      assert(func, 'Cannot call unknown function ' + ident + ', make sure it is exported');
-      return func;
-    }
-  
-  
-  function writeArrayToMemory(array, buffer) {
-      assert(array.length >= 0, 'writeArrayToMemory array must have a length (should be an array or typed array)')
-      HEAP8.set(array, buffer);
-    }
-  
-  
-  
-    /**
-     * @param {string|null=} returnType
-     * @param {Array=} argTypes
-     * @param {Arguments|Array=} args
-     * @param {Object=} opts
-     */
-  function ccall(ident, returnType, argTypes, args, opts) {
-      // For fast lookup of conversion functions
-      var toC = {
-        'string': (str) => {
-          var ret = 0;
-          if (str !== null && str !== undefined && str !== 0) { // null string
-            // at most 4 bytes per UTF-8 code point, +1 for the trailing '\0'
-            ret = stringToUTF8OnStack(str);
-          }
-          return ret;
-        },
-        'array': (arr) => {
-          var ret = stackAlloc(arr.length);
-          writeArrayToMemory(arr, ret);
-          return ret;
-        }
-      };
-  
-      function convertReturnValue(ret) {
-        if (returnType === 'string') {
-          
-          return UTF8ToString(ret);
-        }
-        if (returnType === 'boolean') return Boolean(ret);
-        return ret;
-      }
-  
-      var func = getCFunc(ident);
-      var cArgs = [];
-      var stack = 0;
-      assert(returnType !== 'array', 'Return type should not be "array".');
-      if (args) {
-        for (var i = 0; i < args.length; i++) {
-          var converter = toC[argTypes[i]];
-          if (converter) {
-            if (stack === 0) stack = stackSave();
-            cArgs[i] = converter(args[i]);
-          } else {
-            cArgs[i] = args[i];
-          }
-        }
-      }
-      var ret = func.apply(null, cArgs);
-      function onDone(ret) {
-        if (stack !== 0) stackRestore(stack);
-        return convertReturnValue(ret);
-      }
-  
-      ret = onDone(ret);
-      return ret;
-    }
-  
-    /**
-     * @param {string=} returnType
-     * @param {Array=} argTypes
-     * @param {Object=} opts
-     */
-  function cwrap(ident, returnType, argTypes, opts) {
-      return function() {
-        return ccall(ident, returnType, argTypes, arguments, opts);
-      }
-    }
-
   var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
     if (!parent) {
       parent = this;  // root node sets parent to itself
@@ -10009,7 +9926,6 @@ var dynCall_jiji = Module["dynCall_jiji"] = createExportWrapper("dynCall_jiji");
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===
 
-Module["cwrap"] = cwrap;
 var missingLibrarySymbols = [
   'isLeapYear',
   'ydayFromDate',
@@ -10037,6 +9953,9 @@ var missingLibrarySymbols = [
   'writeI53ToU64Signaling',
   'convertI32PairToI53',
   'convertU32PairToI53',
+  'getCFunc',
+  'ccall',
+  'cwrap',
   'uleb128Encode',
   'sigToWasmTypes',
   'generateFuncType',
@@ -10059,6 +9978,7 @@ var missingLibrarySymbols = [
   'UTF32ToString',
   'stringToUTF32',
   'lengthBytesUTF32',
+  'writeArrayToMemory',
   'fillDeviceOrientationEventData',
   'registerDeviceOrientationEventCallback',
   'fillDeviceMotionEventData',
@@ -10177,8 +10097,6 @@ var unexportedSymbols = [
   'readI53FromI64',
   'readI53FromU64',
   'convertI32PairToI53Checked',
-  'getCFunc',
-  'ccall',
   'freeTableIndexes',
   'functionsInTableMap',
   'setValue',
@@ -10196,7 +10114,6 @@ var unexportedSymbols = [
   'UTF16Decoder',
   'stringToNewUTF8',
   'stringToUTF8OnStack',
-  'writeArrayToMemory',
   'JSEvents',
   'registerKeyEventCallback',
   'specialHTMLTargets',
