@@ -6,7 +6,7 @@ void loop() {
 }
 
 int main() {
-        emscripten_set_main_loop(loop, 0, 0);
+        emscripten_set_main_loop(loop, 60, 1);
         printf("End!\n");
         return 0;
 }
