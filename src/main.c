@@ -31,7 +31,7 @@ void DrawPlayer(ecs_iter_t* it);
 void SetupDraw(ecs_iter_t* it);
 void PresentDraw(ecs_iter_t* it);
 
-void main_loop(void){
+void main_loop(){
     // Advance Game world
     ecs_progress(world, 0);
     // Check If user want to quit
