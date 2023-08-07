@@ -1,6 +1,10 @@
 #include "all_imports.h"
 
+void one_iter() {
+  // Can render to the screen here, etc.
+  printf("one iteration");
+}
+
 int main() {
-  printf("hello, world!\n");
-  return 0;
+  emscripten_set_main_loop(one_iter, 0, 1);
 }
